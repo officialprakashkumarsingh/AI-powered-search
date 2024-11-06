@@ -55,6 +55,10 @@ main {
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
+    transition-duration: 2s;
+}
+.search-box:hover{
+    border: 2px solid white;
 }
 
 .search-box input {
@@ -119,7 +123,7 @@ button:hover {
 }
 
 .suggestion-btn {
-    background: #2A2A2A;
+    background: #2a2a2a;
     padding: 1rem;
     border-radius: 12px;
     text-align: left;
