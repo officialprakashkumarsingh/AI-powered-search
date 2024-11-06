@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #1C1C1C;
+}
+
+::placeholder {
+  color: #666;
+}
+
+/* Prevent footer from being modified */
+footer p {
+  pointer-events: none !important;
+  user-select: none !important;
+}
