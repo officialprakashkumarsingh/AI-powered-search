@@ -19,7 +19,7 @@
                 <input type="text" placeholder="Search anything..." id="searchInput">
                 <div class="search-actions">
                     <!-- <button class="attach-btn">📎</button> -->
-                    <div class="divider"></div>
+                    <!-- <div class="divider"></div> -->
                     <button class="search-btn">→</button>
                 </div>
             </div>
@@ -63,6 +63,7 @@
                 "who made you?", 
                 "who created you?", 
                 "who developed you?", 
+                "who",
                 "who is the creator of this ai?"
             ];
 
@@ -70,7 +71,7 @@
             const normalizedQuery = query.replace(/\s+/g, '').toLowerCase();
 
             if (developerQuestions.some(q => normalizedQuery.includes(q.replace(/\s+/g, '').toLowerCase()))) {
-                typeWriter("RAHUL");
+                typeWriter("I am an AI-powered search engine built on the Google Gemini API, developed by Team.");
                 return;  // Stop further execution
             }
 
