@@ -27,14 +27,14 @@
             <div class="result-box" id="resultBox"></div>
 
             <div class="suggestions">
-                <button class="suggestion-btn"><span>🔴</span> Who is C programming founder</button>
+                <button class="suggestion-btn"><span>🔴</span> What is red light therapy?</button>
                 <button class="suggestion-btn"><span>👩‍🍳</span> Bestselling cookbooks this year</button>
                 <button class="suggestion-btn"><span>📈</span> Will US interest rates go down this year?</button>
                 <button class="suggestion-btn"><span>🗳️</span> Registration deadlines for the US election</button>
             </div>
         </div>
     </main>
-    <br>
+
     <footer>
         <p>Developed by Rahul</p>
     </footer>
@@ -50,7 +50,12 @@
             if (!query) return;
 
             resultBox.style.display = 'block';
-            resultBox.innerHTML = '<div class="loader"></div>';
+            resultBox.innerHTML = '';  // Clear previous result
+
+            // Show typing animation while waiting for the result
+            const loader = document.createElement('div');
+            loader.classList.add('loader');
+            resultBox.appendChild(loader);
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
@@ -68,10 +73,10 @@
                 });
 
                 const data = await response.json();
-
+                
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const text = data.candidates[0].content.parts[0].text;
-                    typeText(text);
+                    const answerText = data.candidates[0].content.parts[0].text;
+                    typeWriter(answerText);  // Call typewriter effect on the answer text
                 } else {
                     throw new Error('Invalid response format');
                 }
@@ -80,35 +85,28 @@
             }
         }
 
-        function typeText(text) {
-            resultBox.innerHTML = '';
+        function typeWriter(text) {
             let index = 0;
-            
-            // Check if the first line is a heading and make it bold
-            const lines = text.split('\n');
-            const isHeading = /^[A-Z\s]+$/.test(lines[0].trim());
-            if (isHeading) {
-                lines[0] = `<strong>${lines[0]}</strong>`;
-            }
+            resultBox.innerHTML = '';  // Clear loader and prepare for typing animation
+            const typingElement = document.createElement('p');
+            resultBox.appendChild(typingElement);
 
-            text = lines.join('\n');
-            
-            function type() {
+            function typeCharacter() {
                 if (index < text.length) {
-                    resultBox.innerHTML += text.charAt(index);
+                    typingElement.innerHTML += text.charAt(index);
                     index++;
-                    setTimeout(type, 10); // Adjust the speed of typing here
+                    setTimeout(typeCharacter, 0);  // Adjust typing speed here
                 }
             }
 
-            type();
+            typeCharacter();  // Start typing animation
         }
 
         searchBtn.addEventListener('click', searchQuery);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') searchQuery();
         });
-
+        
         document.querySelectorAll('.suggestion-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 searchInput.value = btn.textContent.slice(2);

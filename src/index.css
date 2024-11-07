@@ -15,7 +15,7 @@ body {
 }
 
 /* Prevent footer from being modified */
-footer p {
+/* footer p {
   pointer-events: none !important;
   user-select: none !important;
-}
+} */
