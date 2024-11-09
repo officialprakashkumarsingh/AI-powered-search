@@ -153,11 +153,33 @@
                 const normalizedQuery = query.toLowerCase().trim();
                 const normalizedKeyword = keyword.toLowerCase();
                 
-                // Direct matches for AI identity questions
+                // Exact matches
                 if (normalizedQuery === normalizedKeyword || 
-                    normalizedQuery === normalizedKeyword + '?' || 
-                    normalizedQuery.includes(normalizedKeyword)) {
+                    normalizedQuery === normalizedKeyword + '?') {
                     return true;
+                }
+                
+                // For "rahul" specifically, make sure it's about the developer
+                if (normalizedQuery.includes('rahul')) {
+                    // Only match if it's specifically about the developer/creator
+                    const developerPrefixes = [
+                        'who is',
+                        'developer',
+                        'created by',
+                        'made by',
+                        'built by'
+                    ];
+                    return developerPrefixes.some(prefix => 
+                        normalizedQuery === `${prefix} rahul` || 
+                        normalizedQuery === `${prefix} rahul r`
+                    );
+                }
+                
+                // For other developer-related queries, check for exact phrases
+                if (normalizedQuery.includes('who') || 
+                    normalizedQuery.includes('developer') || 
+                    normalizedQuery.includes('creator')) {
+                    return normalizedQuery === normalizedKeyword;
                 }
                 
                 return false;
