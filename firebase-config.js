@@ -3,7 +3,10 @@ import {
     getFirestore, 
     collection, 
     addDoc, 
-    serverTimestamp 
+    serverTimestamp,
+    getDocs,
+    query,
+    orderBy 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // Initialize Firebase
@@ -21,28 +24,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Create a function to handle database storage
+// Function to store search data
 async function storeSearchData(query, response) {
     try {
-        console.log('Attempting to store data:', { query, response });
-        
-        const searchData = {
+        const docRef = await addDoc(collection(db, 'searches'), {
             query: query,
             response: response,
             timestamp: serverTimestamp(),
-            userAgent: navigator.userAgent,
-            createdAt: new Date().toISOString()
-        };
-
-        const collectionRef = collection(db, 'searches');
-        const docRef = await addDoc(collectionRef, searchData);
-        
-        console.log("Success! Document written with ID:", docRef.id);
-        console.log("Stored data:", searchData);
+            userAgent: navigator.userAgent
+        });
         return true;
     } catch (e) {
-        console.error("Error adding document:", e);
-        console.error("Error details:", e.message);
+        console.error("Error adding document: ", e);
         return false;
     }
 }

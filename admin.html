@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know More AI - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-right: 1px solid var(--border-color);
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #6b7280;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #f3f4f6;
+            color: #2563eb;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #f3f4f6;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: none;
+            outline: none;
+            width: 100%;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            height: 400px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Recent Searches */
+        .search-list {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .search-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .search-query {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .search-response {
+            color: #6b7280;
+            margin: 0.5rem 0;
+        }
+
+        .search-meta {
+            display: flex;
+            gap: 1rem;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                display: none;
+            }
+            .sidebar.active {
+                display: block;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-card {
+                height: 300px;
+            }
+        }
+
+        /* Dark theme variables */
+        :root[data-theme="dark"] {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --border-color: #374151;
+            --accent-color: #3b82f6;
+            --card-bg: #1f2937;
+            --hover-bg: #2d3748;
+        }
+
+        /* Light theme variables */
+        :root[data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --accent-color: #2563eb;
+            --card-bg: #ffffff;
+            --hover-bg: #f3f4f6;
+        }
+
+        .stat-card, .chart-card, .search-list, .header {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Add theme toggle button styles */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .storage-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+        }
+
+        .storage-progress {
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Fix desktop layout */
+        @media (min-width: 1024px) {
+            .dashboard-container {
+                display: grid;
+                grid-template-columns: 250px 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .main-content {
+                margin-left: 250px;
+                padding: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .charts-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+
+            .chart-card {
+                min-height: 400px;
+            }
+        }
+
+        /* Improve chart responsiveness */
+        .chart-container {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        canvas {
+            max-height: 100%;
+        }
+
+        .export-section {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .export-btn {
+            background: #059669;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                Know More AI
+            </div>
+            <div class="nav-links">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i> Dashboard
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-search"></i> Searches
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-search"></i>
+                    <div class="stat-number" id="totalSearches">0</div>
+                    <div class="stat-label">Total Searches</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-number" id="todaySearches">0</div>
+                    <div class="stat-label">Today's Searches</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-number" id="uniqueUsers">0</div>
+                    <div class="stat-label">Unique Users</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-font"></i>
+                    <div class="stat-number" id="totalCharacters">0</div>
+                    <div class="stat-label">Characters Generated</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Site Traffic</h3>
+                    <canvas id="searchesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Trending Searches</h3>
+                    <canvas id="trendingChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card mb-4">
+                <h3>User Locations</h3>
+                <canvas id="locationChart"></canvas>
+            </div>
+
+            <div class="search-list" id="searchList">
+                <h2>Recent Searches</h2>
+                <!-- Search items will be populated here -->
+            </div>
+
+            <div class="export-section">
+                <button class="export-btn" onclick="exportToExcel()">
+                    <i class="fas fa-file-excel"></i>
+                    Export to Excel
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Replace the existing script section -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            query, 
+            orderBy, 
+            getDocs,
+            limit,
+            getCountFromServer
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMR3Fv-2zB7GfyRqmtLZusNqqY0VEUg4k",
+            authDomain: "fir-8481c.firebaseapp.com",
+            projectId: "fir-8481c",
+            storageBucket: "fir-8481c.appspot.com",
+            messagingSenderId: "292488648902",
+            appId: "1:292488648902:web:83c8714d915ad7375e9fc7",
+            measurementId: "G-DQ90J277V3"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to format numbers
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Function to load and display data
+        async function loadData() {
+            try {
+                console.log('Loading data...'); // Debug log
+
+                // Get total count of all searches
+                const searchesRef = collection(db, 'searches');
+                const snapshot = await getCountFromServer(searchesRef);
+                const totalSearches = snapshot.data().count;
+
+                // Get recent searches (limited to 10)
+                const q = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
+                const querySnapshot = await getDocs(q);
+                
+                let todaySearches = 0;
+                let totalCharacters = 0;
+                const uniqueUsers = new Set();
+                const searches = [];
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    console.log('Search data:', data); // Debug log
+
+                    totalCharacters += data.response?.length || 0;
+                    uniqueUsers.add(data.userAgent);
+
+                    if (data.timestamp?.toDate() >= today) {
+                        todaySearches++;
+                    }
+
+                    searches.push({
+                        id: doc.id,
+                        query: data.query || 'No query',
+                        response: data.response || 'No response',
+                        timestamp: data.timestamp?.toDate() || new Date(),
+                        userAgent: data.userAgent || 'Unknown'
+                    });
+                });
+
+                // Update statistics
+                document.getElementById('totalSearches').textContent = formatNumber(totalSearches);
+                document.getElementById('todaySearches').textContent = formatNumber(todaySearches);
+                document.getElementById('uniqueUsers').textContent = formatNumber(uniqueUsers.size);
+                document.getElementById('totalCharacters').textContent = formatNumber(totalCharacters);
+
+                // Update search list
+                const searchList = document.getElementById('searchList');
+                searchList.innerHTML = '<h2>Recent Searches</h2>';
+                
+                searches.forEach(search => {
+                    const searchItem = document.createElement('div');
+                    searchItem.className = 'search-item';
+                    searchItem.innerHTML = `
+                        <div class="search-query">
+                            <i class="fas fa-search"></i>
+                            ${search.query}
+                        </div>
+                        <div class="search-response">${search.response.substring(0, 150)}...</div>
+                        <div class="search-meta">
+                            <span><i class="far fa-clock"></i> ${search.timestamp.toLocaleString()}</span>
+                            <span><i class="fas fa-text-width"></i> ${search.response.length} chars</span>
+                        </div>
+                    `;
+                    searchList.appendChild(searchItem);
+                });
+
+                // Update charts
+                updateCharts(searches);
+
+                console.log('Data loaded successfully'); // Debug log
+
+            } catch (error) {
+                console.error("Error loading data:", error);
+                console.log(error.stack); // Debug log
+            }
+        }
+
+        // Function to update charts
+        function updateCharts(searches) {
+            // Site Traffic Chart
+            const searchCtx = document.getElementById('searchesChart').getContext('2d');
+            new Chart(searchCtx, {
+                type: 'line',
+                data: {
+                    labels: ['7 Days Ago', '6 Days Ago', '5 Days Ago', '4 Days Ago', '3 Days Ago', '2 Days Ago', 'Today'],
+                    datasets: [{
+                        label: 'Searches',
+                        data: [12, 19, 3, 5, 2, 3, searches.length],
+                        borderColor: '#2563eb',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Trending Searches Chart
+            const trendingCtx = document.getElementById('trendingChart').getContext('2d');
+            const searchCounts = {};
+            searches.forEach(search => {
+                searchCounts[search.query] = (searchCounts[search.query] || 0) + 1;
+            });
+
+            new Chart(trendingCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(searchCounts).slice(0, 5),
+                    datasets: [{
+                        data: Object.values(searchCounts).slice(0, 5),
+                        backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Location Chart
+            const locationCtx = document.getElementById('locationChart').getContext('2d');
+            const deviceStats = {
+                Desktop: 0,
+                Mobile: 0,
+                Tablet: 0
+            };
+
+            searches.forEach(search => {
+                const ua = search.userAgent.toLowerCase();
+                if (ua.includes('mobile')) deviceStats.Mobile++;
+                else if (ua.includes('tablet')) deviceStats.Tablet++;
+                else deviceStats.Desktop++;
+            });
+
+            new Chart(locationCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(deviceStats),
+                    datasets: [{
+                        label: 'Device Types',
+                        data: Object.values(deviceStats),
+                        backgroundColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Load data when page loads
+        loadData();
+
+        // Add refresh functionality
+        document.querySelector('.search-bar input').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                loadData();
+            }
+        });
+
+        // Theme toggle functionality
+        window.toggleTheme = function() {
+            const root = document.documentElement;
+            const currentTheme = root.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Set initial theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Make exportToExcel function globally available
+        window.exportToExcel = async function() {
+            try {
+                // Get all searches
+                const searchesRef = collection(db, 'searches');
+                const q = query(searchesRef, orderBy('timestamp', 'desc'));
+                const querySnapshot = await getDocs(q);
+                
+                const data = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const search = doc.data();
+                    data.push({
+                        'Date': search.timestamp?.toDate().toLocaleString() || 'No date',
+                        'Query': search.query || 'No query',
+                        'Response': search.response || 'No response',
+                        'Device': search.userAgent || 'Unknown device',
+                        'Characters': search.response?.length || 0
+                    });
+                });
+
+                // Convert to CSV
+                let csvContent = "data:text/csv;charset=utf-8,";
+                
+                // Add headers
+                const headers = Object.keys(data[0]);
+                csvContent += headers.join(",") + "\n";
+                
+                // Add rows
+                data.forEach(row => {
+                    let rowContent = headers.map(header => {
+                        let cell = row[header] || "";
+                        // Escape quotes and commas
+                        cell = cell.toString().replace(/"/g, '""');
+                        if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+                            cell = `"${cell}"`;
+                        }
+                        return cell;
+                    }).join(",");
+                    csvContent += rowContent + "\n";
+                });
+
+                // Create download link
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `searches_${new Date().toLocaleDateString()}.csv`);
+                document.body.appendChild(link);
+                
+                // Trigger download
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (error) {
+                console.error("Error exporting data:", error);
+                alert("Error exporting data. Please try again.");
+            }
+        }
+    </script>
+
+    <!-- Add theme toggle button -->
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </button>
+</body>
+</html> 
+</html> 
