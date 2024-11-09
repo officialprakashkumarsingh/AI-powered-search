@@ -11,14 +11,18 @@ body {
     color: white;
     min-height: 100vh;
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
 }
 
 /* Main Layout */
 main {
+    flex: 1;
     padding: 2rem 1rem;
     max-width: 800px;
     margin: 0 auto;
-    min-height: calc(100vh - 60px);
+    margin-bottom: 2rem;
 }
 
 /* Hero Section */
@@ -290,14 +294,68 @@ button:hover {
 
 /* Footer */
 footer {
-    text-align: center;
-    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 1rem 0.5rem 1rem;
     background: #1C1C1C;
-    color: #666;
+    margin-top: auto;
+    position: relative;
+}
+
+footer p {
+    display: inline-block;
+    margin: 0 0.5rem;
+}
+
+footer a {
+    color: #9CA3AF;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 14px;
+}
+
+footer a:hover {
+    color: #FFFFFF;
+}
+
+.modal {
+    display: none;
     position: fixed;
-    bottom: 0;
+    top: 0;
+    left: 0;
     width: 100%;
-    user-select: none;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.close-btn {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
 }
 
 /* Responsive Design */
@@ -344,4 +402,123 @@ strong {
 /* Remove the glow effect */
 .action-btn:hover {
     box-shadow: none;
+}
+
+/* Page Content Styles */
+.page-content {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: #E5E7EB;
+}
+
+.back-button {
+    margin-bottom: 2rem;
+}
+
+.back-button a {
+    color: #9CA3AF;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.back-button a:hover {
+    color: #FFFFFF;
+}
+
+.content-wrapper {
+    background: #2A2A2A;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 4rem;
+}
+
+.content-wrapper h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #FFFFFF;
+}
+
+.content-wrapper h2 {
+    font-size: 1.5rem;
+    margin: 1.5rem 0 1rem;
+    color: #FFFFFF;
+}
+
+.content-wrapper p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.content-wrapper ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.content-wrapper li {
+    margin-bottom: 0.5rem;
+}
+
+/* Update footer styles */
+footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 1rem 0.5rem 1rem;
+    background: #1C1C1C;
+    margin-top: auto;
+    position: relative;
+}
+
+footer p {
+    display: inline-block;
+    margin: 0 0.5rem;
+}
+
+footer a {
+    color: #9CA3AF;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 14px;
+}
+
+footer a:hover {
+    color: #FFFFFF;
+}
+
+/* Contact page specific styles */
+.contact-info {
+    background: #333;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.contact-info h2 {
+    color: #FFFFFF;
+    margin-top: 1.5rem;
+}
+
+.contact-info h2:first-child {
+    margin-top: 0;
+}
+
+/* Add these styles for the developer credit */
+#rahul {
+    text-align: center;
+    margin-top: 0px;
+
+}
+
+#rahul a {
+    color: #9CA3AF;
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 14px;
+}
+
+#rahul a:hover {
+    color: #FFFFFF;
 }
