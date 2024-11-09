@@ -20,15 +20,37 @@ Just ask me anything, and I'll do my best to help!`,
 
         'what is know it all': `Know It All is an AI-powered search engine developed by RAHUL team. I'm designed to provide quick, accurate answers to your questions while maintaining a conversation-like interaction.`,
 
-        'who created you': `I am an AI search engine developed by RAHUL team. I'm designed to help you find answers to your questions using advanced AI technology. Feel free to ask me anything!`,
+        'who created you': `I am "Know It All" - An Advanced AI Search Engine powered by by team RAHUL✨.. I was created by Rahul and his team to help users find answers to their questions instantly.
+
+I have access to a vast knowledge base and use cutting-edge AI technology to provide accurate and helpful responses. My goal is to make information accessible and easy to understand.
+
+Feel free to ask me anything! I'm here to help you find the answers you're looking for.`,
         
-        'who built you': `I was built by RAHUL team. I'm an AI search engine designed to help answer your questions accurately and efficiently.`,
+        'who built you': `I am "Know It All" - An Advanced AI Search Engine powered by team RAHUL✨. I was created by Rahul and his team to help users find answers to their questions instantly.
+
+I have access to a vast knowledge base and use cutting-edge AI technology to provide accurate and helpful responses. My goal is to make information accessible and easy to understand.
+
+Feel free to ask me anything! I'm here to help you find the answers you're looking for.`,
         
-        'who made you': `I was created by RAHUL team. I'm here to help you find answers to your questions using advanced AI technology.`,
+        'who made you': `I am "Know It All" - An Advanced AI Search Engine powered by team RAHUL✨. I was created by Rahul and his team to help users find answers to their questions instantly.
+
+I have access to a vast knowledge base and use cutting-edge AI technology to provide accurate and helpful responses. My goal is to make information accessible and easy to understand.
+
+Feel free to ask me anything! I'm here to help you find the answers you're looking for.`,
         
         'who designed you': `RAHUL team designed me as an AI search engine to help people find accurate information quickly and easily.`,
+
+        'who developerd u': `I was programmed by RAHUL team to be an intelligent search engine that can help answer your questions accurately.`,
+
+        'who made u': `I was programmed by RAHUL team to be an intelligent search engine that can help answer your questions accurately.`,
+
+        'who own you': `I was programmed by RAHUL team to be an intelligent search engine that can help answer your questions accurately.`,
         
-        'who programmed you': `I was programmed by RAHUL team to be an intelligent search engine that can help answer your questions accurately.`
+        'who programmed you': `I was programmed by RAHUL team to be an intelligent search engine that can help answer your questions accurately.`,
+
+        'who owns you': `I am "Know It All" - An Advanced AI Search Engine owned and developed by Rahul and his team. I'm built using by team RAHUL✨. to provide accurate and helpful responses to your questions.
+
+My development and maintenance are handled by the RAHUL team, ensuring I stay up-to-date and reliable. I'm here to make information accessible and easy to understand for everyone.`
     },
 
     // Keywords for capabilities

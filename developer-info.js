@@ -1,16 +1,23 @@
 export const developerInfo = {
-    response: `This AI search engine was developed by Rahul R, a passionate software developer and AI enthusiast. 
+    response: `I am "Know It All" - An Advanced AI Search Engine
 
-Key features implemented by the developer:
-- AI-powered search functionality
-- Real-time response generation
-- Modern user interface
-- Firebase integration for data storage
+This innovative search engine was crafted by Rahul and his Team, combining cutting-edge AI technology with elegant design to deliver instant answers to your questions.
 
-You can connect with the developer at:
-Email: rahul.r@example.com
-GitHub: github.com/rahul-r
-LinkedIn: linkedin.com/in/rahul-r
+✨ Key Features:
+• Powered by Google's Gemini Pro AI API
+• With 15TB of data user to Train the Model
+• Lightning-fast response generation
+• Clean, modern interface
+• Smart context understanding
+• Real-time data processing
 
-Feel free to reach out for any questions or collaborations!`
+🚀 About the Developer:
+Rahul R is a software engineer passionate about making AI technology accessible to everyone. This project represents his vision of creating an intuitive, powerful search experience that helps users find answers instantly.
+
+💡 Connect with Rahul:
+• Portfolio: rahul.dev
+• GitHub: github.com/im.rahul.i
+• Instagram: @im.rahul.u
+
+Feel free to reach out for collaborations or feedback! Together, let's make AI search better for everyone.`
 }; 

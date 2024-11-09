@@ -6,6 +6,16 @@
     <title>Know it all - AI Search</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/generativeai/v1/embedding.js"></script>
+    <script type="module">
+        import { db, storeSearchData } from './firebase-config.js';
+        import { developerInfo } from './developer-info.js';
+        import { aiTrainingData } from './ai-training.js';
+        // Make everything available globally
+        window.storeSearchData = storeSearchData;
+        window.db = db;
+        window.developerInfo = developerInfo;
+        window.aiTrainingData = aiTrainingData;
+    </script>
 </head>
 <body>
     <main>
@@ -19,7 +29,7 @@
                 <input type="text" placeholder="Search anything..." id="searchInput">
                 <div class="search-actions">
                     <!-- <button class="attach-btn">📎</button> -->
-                    <div class="divider"></div>
+                    <!-- <div class="divider"></div> -->
                     <button class="search-btn">→</button>
                 </div>
             </div>
@@ -27,55 +37,105 @@
             <div class="result-box" id="resultBox"></div>
 
             <div class="suggestions">
-                <button class="suggestion-btn"><span>🔴</span> What is red light therapy?</button>
-                <button class="suggestion-btn"><span>👩‍🍳</span> Bestselling cookbooks this year</button>
-                <button class="suggestion-btn"><span>📈</span> Will US interest rates go down this year?</button>
-                <button class="suggestion-btn"><span>🗳️</span> Registration deadlines for the US election</button>
+                <button class="suggestion-btn"><span>🔴</span> What is India?</button>
+                <button class="suggestion-btn"><span>👩‍🍳</span> Bestselling Book in World</button>
+                <button class="suggestion-btn"><span></span> Tesla Shares Today</button>
+                <button class="suggestion-btn"><span>🗳️</span> Today news @ Bangalore..</button>
             </div>
         </div>
     </main>
     <footer>
-        <p>Developed by Rahul</p>
+        <p><a href="about.html">About</a></p>
+        <p><a href="contact.html">Contact</a></p>
+        <p><a href="privacy.html">Privacy Policy</a></p>
     </footer>
+    <p id="rahul"><a href="privacy.html">Developed by Rahul ✨</a></p>
+    <br>
 
     <script>
-        const API_KEY = 'AIzaSyCu5ss8-UrawlqgjaVJjbK6Z0o6hnzeS7g';
+        const API_KEY = "AIzaSyCu5ss8-UrawlqgjaVJjbK6Z0o6hnzeS7g";
         const searchInput = document.getElementById('searchInput');
         const resultBox = document.getElementById('resultBox');
         const searchBtn = document.querySelector('.search-btn');
 
         async function searchQuery() {
-            const query = searchInput.value.trim();
+            const query = searchInput.value.trim().toLowerCase();
             if (!query) return;
 
             resultBox.style.display = 'block';
-            resultBox.innerHTML = '';  // Clear previous result
+            resultBox.innerHTML = '';
 
-            // Show typing animation while waiting for the result
             const loader = document.createElement('div');
             loader.classList.add('loader');
             resultBox.appendChild(loader);
 
-            // Check if the query is related to the developer
-            const developerQuestions = [
-                "who is your developer?", 
-                "who is your developer", 
-                "who made you?", 
-                "who created you?", 
-                "who developed you?", 
-                "who is the creator of this ai?"
+            // More specific developer question check
+            const developerKeywords = [
+                'who is your developer',
+                'who made this website',
+                'who created this website',
+                'who developed this website',
+                'who made this search engine',
+                'who created this search engine',
+                'who developed this search engine',
+                'who developed know it all',
+                'who created know it all',
+                'who is rahul r',
+                'who is the developer of know it all',
+                'who is the developer of this website',
+                'who is rahul',
+                'rahul r',
+                'who made you',
+                'who created you',
+                'who developed you',
+                'who is your creator',
+                'who built you'
             ];
 
-            // Normalize the query by removing spaces and converting to lowercase
-            const normalizedQuery = query.replace(/\s+/g, '').toLowerCase();
+            // Update the isAskingAboutDeveloper check to be more precise
+            const isAskingAboutDeveloper = developerKeywords.some(keyword => {
+                // Exact matches only
+                if (query === keyword || query === keyword + '?' || 
+                    query === 'hey ' + keyword || query === 'hi ' + keyword) {
+                    return true;
+                }
+                
+                // Check for developer-specific phrases
+                if (query.includes('developer') && !query.includes('c developer')) {
+                    return true;
+                }
+                
+                // Only match standalone "rahul" or "rahul r", not when part of other names
+                if ((query === 'rahul' || query === 'rahul r' || 
+                     query === 'who is rahul' || query === 'who is rahul r')) {
+                    return true;
+                }
+                
+                // Check for creation-related questions
+                if (query.includes('who made you') || 
+                    query.includes('who created you') || 
+                    query.includes('who developed you')) {
+                    return true;
+                }
+                
+                return false;
+            });
 
-            if (developerQuestions.some(q => normalizedQuery.includes(q.replace(/\s+/g, '').toLowerCase()))) {
-                typeWriter("RAHUL");
-                return;  // Stop further execution
+            if (isAskingAboutDeveloper) {
+                try {
+                    if (window.storeSearchData) {
+                        await window.storeSearchData(query, window.developerInfo.response);
+                    }
+                    typeWriter(window.developerInfo.response);
+                    loader.remove();
+                    return;
+                } catch (firebaseError) {
+                    console.error('Firebase storage error:', firebaseError);
+                }
             }
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -85,40 +145,135 @@
                             parts: [{
                                 text: query
                             }]
-                        }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.9,
+                            topK: 1,
+                            topP: 1,
+                            maxOutputTokens: 2048,
+                        }
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log('API Response:', data); // Debug log
                 
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
                     const answerText = data.candidates[0].content.parts[0].text;
-                    typeWriter(answerText);  // Call typewriter effect on the answer text
+                    
+                    // Store in Firebase if available
+                    if (window.storeSearchData) {
+                        try {
+                            console.log('Attempting to store search result...'); // Debug log
+                            const stored = await window.storeSearchData(query, answerText);
+                            if (stored) {
+                                console.log('Successfully stored in Firebase');
+                            }
+                        } catch (firebaseError) {
+                            console.error('Firebase storage error:', firebaseError);
+                        }
+                    }
+
+                    typeWriter(answerText);
                 } else {
                     throw new Error('Invalid response format');
                 }
             } catch (error) {
-                resultBox.innerHTML = '<p class="error">Sorry, there was an error processing your request.</p>';
+                console.error('Search error:', error);
+                resultBox.innerHTML = `<p class="error">Sorry, there was an error: ${error.message}</p>`;
+            } finally {
+                loader.remove();
             }
         }
 
         function typeWriter(text) {
             let index = 0;
-            resultBox.innerHTML = '';  // Clear loader and prepare for typing animation
+            resultBox.innerHTML = '';  // Clear previous content
+            
+            // Create header section
+            const header = document.createElement('div');
+            header.className = 'result-header';
+            
+            const icon = document.createElement('div');
+            icon.className = 'perplexity-icon';
+            icon.textContent = 'P';
+            
+            const overview = document.createElement('div');
+            overview.className = 'brief-overview';
+            overview.textContent = "Here's a brief overview:";
+            
+            header.appendChild(icon);
+            header.appendChild(overview);
+            
+            // Add content container
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'content-container';
             const typingElement = document.createElement('p');
-            resultBox.appendChild(typingElement);
+            contentContainer.appendChild(typingElement);
+            
+            // Create action buttons
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'action-buttons';
+            
+            const rewriteBtn = document.createElement('button');
+            rewriteBtn.className = 'action-btn rewrite';
+            rewriteBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg> Rewrite';
+            rewriteBtn.onclick = () => {
+                searchQuery();
+            };
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'action-btn';
+            copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+            copyBtn.onclick = () => {
+                try {
+                    const contentToCopy = contentContainer.textContent || text;
+                    navigator.clipboard.writeText(contentToCopy);
+                    
+                    copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Copied';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                    copyBtn.innerHTML = 'Failed to copy';
+                }
+            };
+            
+            actionButtons.appendChild(rewriteBtn);
+            actionButtons.appendChild(copyBtn);
+            
+            resultBox.appendChild(header);
+            resultBox.appendChild(contentContainer);
+            resultBox.appendChild(actionButtons);
+            
+            const processedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/__(.*?)__/g, '<strong>$1</strong>')
+                .split('\n')
+                .filter(para => para.trim() !== '')
+                .map(para => `<p>${para}</p>`)
+                .join('\n');
 
             function typeCharacter() {
-                if (index < text.length) {
-                    typingElement.innerHTML += text.charAt(index);
+                if (index < processedText.length) {
+                    typingElement.innerHTML = processedText.substring(0, index + 1);
                     index++;
-                    setTimeout(typeCharacter, 0);  // Adjust typing speed here
+                    setTimeout(typeCharacter, 0);
                 }
             }
 
-            typeCharacter();  // Start typing animation
+            typeCharacter();
         }
 
+        // Event Listeners
         searchBtn.addEventListener('click', searchQuery);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') searchQuery();

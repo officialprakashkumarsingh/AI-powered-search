@@ -36,11 +36,10 @@
 
             <div class="result-box" id="resultBox"></div>
 
-            <div class="suggestions">
-                <button class="suggestion-btn"><span>🔴</span> What is India?</button>
-                <button class="suggestion-btn"><span>👩‍🍳</span> Bestselling Book in World</button>
-                <button class="suggestion-btn"><span></span> Tesla Shares Today</button>
-                <button class="suggestion-btn"><span>🗳️</span> Today news @ Bangalore..</button>
+            <div class="suggestions" id="suggestionContainer">
+                <div class="suggestion-row">
+                    <!-- Suggestions will be dynamically populated in rows -->
+                </div>
             </div>
         </div>
     </main>
@@ -49,7 +48,7 @@
         <p><a href="contact.html">Contact</a></p>
         <p><a href="privacy.html">Privacy Policy</a></p>
     </footer>
-    <p id="rahul"><a href="privacy.html">Developed by Rahul ✨</a></p>
+    <p id="rahul"><a href="https://instagram.com/im.rahul.u">Developed by Rahul ✨</a></p>
     <br>
 
     <script>
@@ -58,6 +57,8 @@
         const resultBox = document.getElementById('resultBox');
         const searchBtn = document.querySelector('.search-btn');
 
+        const suggestionEmojis = ['🤖', '💡', '🔍', '💭', '❓', '🎯', '🌟', '📚'];
+
         async function searchQuery() {
             const query = searchInput.value.trim().toLowerCase();
             if (!query) return;
@@ -65,12 +66,59 @@
             resultBox.style.display = 'block';
             resultBox.innerHTML = '';
 
-            const loader = document.createElement('div');
-            loader.classList.add('loader');
-            resultBox.appendChild(loader);
+            // Replace loader with AI searching message
+            const searchingMessage = document.createElement('div');
+            searchingMessage.className = 'ai-searching';
+            searchingMessage.innerHTML = `
+                <div class="search-status">
+                    <div class="search-progress">
+                        <div class="step-container">
+                            <div class="step active">
+                                <span class="step-dot"></span>
+                                <span class="step-text">Connecting to Servers...</span>
+                            </div>
+                            <div class="step">
+                                <span class="step-dot"></span>
+                                <span class="step-text">Searching Information over 15TB database...</span>
+                            </div>
+                            <div class="step">
+                                <span class="step-dot"></span>
+                                <span class="step-text">Processing results...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            resultBox.appendChild(searchingMessage);
 
-            // More specific developer question check
+            // Add this code right after creating searchingMessage to animate the steps
+            let currentStep = 0;
+            const steps = searchingMessage.querySelectorAll('.step');
+            const stepInterval = setInterval(() => {
+                if (currentStep > 0) {
+                    steps[currentStep - 1].classList.remove('active');
+                    steps[currentStep - 1].classList.add('completed');
+                }
+                if (currentStep < steps.length) {
+                    steps[currentStep].classList.add('active');
+                    currentStep++;
+                } else {
+                    clearInterval(stepInterval);
+                }
+            }, 800);
+
+            // Update the developerKeywords array and add specific AI identity questions
             const developerKeywords = [
+                'who created you',
+                'who made you',
+                'who built you',
+                'what are you',
+                'who developed you',
+                'tell me about yourself',
+                'who owns you',
+                'what is know it all',
+                'who is behind you',
+                'who programmed you',
                 'who is your developer',
                 'who made this website',
                 'who created this website',
@@ -89,32 +137,26 @@
                 'who created you',
                 'who developed you',
                 'who is your creator',
-                'who built you'
+                'who built you',
+                'who built this',
+                'who built this website',
+                'who built this search engine',
+                'developer',
+                'creator',
+                'built by',
+                'made by',
+                'developed by'
             ];
 
-            // Update the isAskingAboutDeveloper check to be more precise
+            // Update the isAskingAboutDeveloper check
             const isAskingAboutDeveloper = developerKeywords.some(keyword => {
-                // Exact matches only
-                if (query === keyword || query === keyword + '?' || 
-                    query === 'hey ' + keyword || query === 'hi ' + keyword) {
-                    return true;
-                }
+                const normalizedQuery = query.toLowerCase().trim();
+                const normalizedKeyword = keyword.toLowerCase();
                 
-                // Check for developer-specific phrases
-                if (query.includes('developer') && !query.includes('c developer')) {
-                    return true;
-                }
-                
-                // Only match standalone "rahul" or "rahul r", not when part of other names
-                if ((query === 'rahul' || query === 'rahul r' || 
-                     query === 'who is rahul' || query === 'who is rahul r')) {
-                    return true;
-                }
-                
-                // Check for creation-related questions
-                if (query.includes('who made you') || 
-                    query.includes('who created you') || 
-                    query.includes('who developed you')) {
+                // Direct matches for AI identity questions
+                if (normalizedQuery === normalizedKeyword || 
+                    normalizedQuery === normalizedKeyword + '?' || 
+                    normalizedQuery.includes(normalizedKeyword)) {
                     return true;
                 }
                 
@@ -123,11 +165,23 @@
 
             if (isAskingAboutDeveloper) {
                 try {
-                    if (window.storeSearchData) {
-                        await window.storeSearchData(query, window.developerInfo.response);
+                    let response;
+                    const normalizedQuery = query.toLowerCase().trim();
+                    
+                    // Check for exact matches in aiTrainingData first
+                    if (window.aiTrainingData && window.aiTrainingData.customResponses[normalizedQuery]) {
+                        response = window.aiTrainingData.customResponses[normalizedQuery];
+                    } else {
+                        // Use the default developer info if no exact match
+                        response = window.developerInfo.response;
                     }
-                    typeWriter(window.developerInfo.response);
-                    loader.remove();
+
+                    if (window.storeSearchData) {
+                        await window.storeSearchData(query, response);
+                    }
+                    typeWriter(response);
+                    searchingMessage.remove();
+                    clearInterval(stepInterval);
                     return;
                 } catch (firebaseError) {
                     console.error('Firebase storage error:', firebaseError);
@@ -186,13 +240,15 @@
                 console.error('Search error:', error);
                 resultBox.innerHTML = `<p class="error">Sorry, there was an error: ${error.message}</p>`;
             } finally {
-                loader.remove();
+                searchingMessage.remove();
+                clearInterval(stepInterval);
             }
         }
 
         function typeWriter(text) {
+            const TYPING_SPEED = 0; // Remove any delay
             let index = 0;
-            resultBox.innerHTML = '';  // Clear previous content
+            resultBox.innerHTML = '';
             
             // Create header section
             const header = document.createElement('div');
@@ -212,7 +268,7 @@
             // Add content container
             const contentContainer = document.createElement('div');
             contentContainer.className = 'content-container';
-            const typingElement = document.createElement('p');
+            const typingElement = document.createElement('div');
             contentContainer.appendChild(typingElement);
             
             // Create action buttons
@@ -222,21 +278,30 @@
             const rewriteBtn = document.createElement('button');
             rewriteBtn.className = 'action-btn rewrite';
             rewriteBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg> Rewrite';
-            rewriteBtn.onclick = () => {
-                searchQuery();
-            };
+            rewriteBtn.onclick = () => searchQuery();
             
             const copyBtn = document.createElement('button');
             copyBtn.className = 'action-btn';
             copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
             copyBtn.onclick = () => {
                 try {
-                    const contentToCopy = contentContainer.textContent || text;
-                    navigator.clipboard.writeText(contentToCopy);
+                    // Create a temporary textarea
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
                     
+                    // Select and copy the text
+                    textarea.select();
+                    document.execCommand('copy');
+                    
+                    // Remove the temporary textarea
+                    document.body.removeChild(textarea);
+                    
+                    // Update button to show success
                     copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Copied';
                     copyBtn.classList.add('copied');
                     
+                    // Reset button after 2 seconds
                     setTimeout(() => {
                         copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
                         copyBtn.classList.remove('copied');
@@ -244,16 +309,21 @@
                 } catch (err) {
                     console.error('Failed to copy:', err);
                     copyBtn.innerHTML = 'Failed to copy';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+                    }, 2000);
                 }
             };
             
             actionButtons.appendChild(rewriteBtn);
             actionButtons.appendChild(copyBtn);
             
+            // Append all elements immediately
             resultBox.appendChild(header);
             resultBox.appendChild(contentContainer);
             resultBox.appendChild(actionButtons);
             
+            // Process text immediately
             const processedText = text
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/__(.*?)__/g, '<strong>$1</strong>')
@@ -262,28 +332,128 @@
                 .map(para => `<p>${para}</p>`)
                 .join('\n');
 
+            // Optimized typing animation with increased speed
             function typeCharacter() {
+                // Type multiple characters at once for increased speed
+                for(let i = 0; i < 10; i++) { // Type 10 characters per frame
+                    if (index < processedText.length) {
+                        typingElement.innerHTML = processedText.substring(0, index + 1);
+                        index++;
+                    }
+                }
                 if (index < processedText.length) {
-                    typingElement.innerHTML = processedText.substring(0, index + 1);
-                    index++;
-                    setTimeout(typeCharacter, 0);
+                    requestAnimationFrame(typeCharacter);
                 }
             }
 
-            typeCharacter();
+            requestAnimationFrame(typeCharacter);
         }
+
+        async function generateSuggestions() {
+            const suggestionContainer = document.getElementById('suggestionContainer');
+            
+            // Show blinking suggestions
+            suggestionContainer.innerHTML = `
+                <div class="suggestion-row">
+                    <button class="suggestion-btn blink">
+                        <span>🤌</span> What's new today?
+                    </button>
+                    <button class="suggestion-btn blink">
+                        <span>💭</span> Tell me something
+                    </button>
+                </div>
+                <div class="suggestion-row">
+                    <button class="suggestion-btn blink">
+                        <span>❤️‍🔥</span> I'm curious about
+                    </button>
+                    <button class="suggestion-btn blink">
+                        <span>🔵</span> Let's explore
+                    </button>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: "Generate 4 interesting, diverse, and trending search queries that people might want to know about. Each should be less than 6 words. Return only the queries separated by '|' without any other text."
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.9,
+                            topK: 1,
+                            topP: 1,
+                            maxOutputTokens: 256,
+                        }
+                    })
+                });
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    const suggestions = data.candidates[0].content.parts[0].text.split('|');
+                    updateSuggestionButtons(suggestions);
+                }
+            } catch (error) {
+                console.error('Error generating suggestions:', error);
+                suggestionContainer.innerHTML = `
+                    <div class="suggestion-row">
+                        <button class="suggestion-btn error-suggestion">
+                            <span>⚠️</span> Failed to load suggestions
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function updateSuggestionButtons(suggestions) {
+            const suggestionContainer = document.getElementById('suggestionContainer');
+            suggestionContainer.innerHTML = '';
+
+            // Create two rows
+            for (let i = 0; i < suggestions.length; i += 2) {
+                const row = document.createElement('div');
+                row.className = 'suggestion-row';
+
+                // Create first suggestion in row
+                const button1 = document.createElement('button');
+                button1.className = 'suggestion-btn';
+                const emoji1 = suggestionEmojis[Math.floor(Math.random() * suggestionEmojis.length)];
+                button1.innerHTML = `<span>${emoji1}</span> ${suggestions[i].trim()}`;
+                button1.addEventListener('click', () => {
+                    searchInput.value = suggestions[i].trim();
+                    searchQuery();
+                });
+                row.appendChild(button1);
+
+                // Create second suggestion in row if it exists
+                if (i + 1 < suggestions.length) {
+                    const button2 = document.createElement('button');
+                    button2.className = 'suggestion-btn';
+                    const emoji2 = suggestionEmojis[Math.floor(Math.random() * suggestionEmojis.length)];
+                    button2.innerHTML = `<span>${emoji2}</span> ${suggestions[i + 1].trim()}`;
+                    button2.addEventListener('click', () => {
+                        searchInput.value = suggestions[i + 1].trim();
+                        searchQuery();
+                    });
+                    row.appendChild(button2);
+                }
+
+                suggestionContainer.appendChild(row);
+            }
+        }
+
+        generateSuggestions();
+        setInterval(generateSuggestions, 300000);
 
         // Event Listeners
         searchBtn.addEventListener('click', searchQuery);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') searchQuery();
-        });
-        
-        document.querySelectorAll('.suggestion-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                searchInput.value = btn.textContent.slice(2);
-                searchQuery();
-            });
         });
     </script>
 </body>
