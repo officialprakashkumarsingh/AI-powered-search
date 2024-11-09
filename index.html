@@ -6,6 +6,7 @@
     <title>Know it all - AI Search</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/generativeai/v1/embedding.js"></script>
+    <script src="utils/crypto.js"></script>
 </head>
 <body>
     <main>
@@ -39,7 +40,7 @@
     </footer>
 
     <script>
-        const API_KEY = 'AIzaSyCu5ss8-UrawlqgjaVJjbK6Z0o6hnzeS7g';
+        const ENCRYPTED_KEY = "QUl6YVN5Q3U1c3M4LVVyYXdscWdqYVZKamJLNlowbzZobnplUzdn"; // This is your encrypted API key
         const searchInput = document.getElementById('searchInput');
         const resultBox = document.getElementById('resultBox');
         const searchBtn = document.querySelector('.search-btn');
@@ -49,34 +50,16 @@
             if (!query) return;
 
             resultBox.style.display = 'block';
-            resultBox.innerHTML = '';  // Clear previous result
+            resultBox.innerHTML = '';
 
-            // Show typing animation while waiting for the result
             const loader = document.createElement('div');
             loader.classList.add('loader');
             resultBox.appendChild(loader);
 
-            // Check if the query is related to the developer
-            const developerQuestions = [
-                "who is your developer?", 
-                "who is your developer", 
-                "who made you?", 
-                "who created you?", 
-                "who developed you?", 
-                "who",
-                "who is the creator of this ai?"
-            ];
-
-            // Normalize the query by removing spaces and converting to lowercase
-            const normalizedQuery = query.replace(/\s+/g, '').toLowerCase();
-
-            if (developerQuestions.some(q => normalizedQuery.includes(q.replace(/\s+/g, '').toLowerCase()))) {
-                typeWriter("I am an AI-powered search engine built on the Google Gemini API, developed by Team.");
-                return;  // Stop further execution
-            }
+            const decryptedKey = decrypt(ENCRYPTED_KEY);
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${decryptedKey}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -105,19 +88,96 @@
 
         function typeWriter(text) {
             let index = 0;
-            resultBox.innerHTML = '';  // Clear loader and prepare for typing animation
+            resultBox.innerHTML = '';  // Clear previous content
+            
+            // Create header section
+            const header = document.createElement('div');
+            header.className = 'result-header';
+            
+            const icon = document.createElement('div');
+            icon.className = 'perplexity-icon';
+            icon.textContent = 'P';
+            
+            const overview = document.createElement('div');
+            overview.className = 'brief-overview';
+            overview.textContent = "Here's a brief overview:";
+            
+            header.appendChild(icon);
+            header.appendChild(overview);
+            
+            // Add content container
+            const contentContainer = document.createElement('div');
+            contentContainer.className = 'content-container';
             const typingElement = document.createElement('p');
-            resultBox.appendChild(typingElement);
+            contentContainer.appendChild(typingElement);
+            
+            // Create action buttons
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'action-buttons';
+            
+            const rewriteBtn = document.createElement('button');
+            rewriteBtn.className = 'action-btn rewrite';
+            rewriteBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg> Rewrite';
+            rewriteBtn.onclick = () => {
+                searchQuery();
+            };
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'action-btn';
+            copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+            copyBtn.onclick = () => {
+                try {
+                    const contentToCopy = contentContainer.textContent || text;
+                    const textarea = document.createElement('textarea');
+                    textarea.value = contentToCopy;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Copied';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+                        copyBtn.classList.remove('copied');
+                    }, 5000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                    copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Failed';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+                    }, 2000);
+                }
+            };
+            
+            // Only add rewrite and copy buttons
+            actionButtons.appendChild(rewriteBtn);
+            actionButtons.appendChild(copyBtn);
+            
+            // Add all elements to result box in the correct order
+            resultBox.appendChild(header);
+            resultBox.appendChild(contentContainer);
+            resultBox.appendChild(actionButtons); // Add buttons last
+            
+            // Process markdown and add line breaks between paragraphs
+            const processedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/__(.*?)__/g, '<strong>$1</strong>')
+                .split('\n')
+                .filter(para => para.trim() !== '')
+                .map(para => `<p>${para}</p>`)
+                .join('\n');
 
             function typeCharacter() {
-                if (index < text.length) {
-                    typingElement.innerHTML += text.charAt(index);
+                if (index < processedText.length) {
+                    typingElement.innerHTML = processedText.substring(0, index + 1);
                     index++;
-                    setTimeout(typeCharacter, 0);  // Adjust typing speed here
+                    setTimeout(typeCharacter, 0);
                 }
             }
 
-            typeCharacter();  // Start typing animation
+            typeCharacter();
         }
 
         searchBtn.addEventListener('click', searchQuery);

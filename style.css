@@ -50,15 +50,20 @@ main {
 
 .search-box {
     background: #2A2A2A;
-    border-radius: 12px;
-    padding: 1rem;
+    border-radius: 16px;
+    padding: 16px 20px;
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
-    transition-duration: 2s;
+    transition: all 0.3s ease;
+    border: 1px solid #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-.search-box:hover{
-    border: 2px solid white;
+
+.search-box:focus-within {
+    border-color: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
 }
 
 .search-box input {
@@ -69,16 +74,59 @@ main {
     font-size: 1.1rem;
     outline: none;
     padding-right: 1rem;
+    font-weight: 400;
 }
 
 .search-box input::placeholder {
     color: #666;
+    font-weight: 400;
 }
 
 .search-actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 12px;
+}
+
+.search-btn {
+    background: #404040;
+    color: #E5E7EB;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn:hover {
+    background: #cab0b0;
+    color: #1C1C1C;
+    transform: translateY(-1px);
+    opacity: 1;
+}
+
+.search-btn:active {
+    transform: translateY(0);
+}
+
+/* Add a subtle gradient border effect */
+@keyframes borderGlow {
+    0% {
+        border-color: #333;
+    }
+    50% {
+        border-color: #444;
+    }
+    100% {
+        border-color: #333;
+    }
+}
+
+.search-box:hover {
+    border-color: #ffffff;
+    animation: none;
 }
 
 .divider {
@@ -102,16 +150,92 @@ button:hover {
 
 /* Result Box */
 .result-box {
-    background: #2A2A2A;
+    background: #1E1E1E;
     border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1rem 0;
+    padding: 24px 28px;
+    margin-top: 20px;
+    color: #FFFFFF;
     display: none;
+    position: relative;
 }
 
 .result-box p {
-    white-space: pre-wrap;
+    font-size: 16px;
     line-height: 1.6;
+    margin: 0;
+}
+
+/* Style for the header section in result box */
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.perplexity-icon {
+    width: 24px;
+    height: 24px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brief-overview {
+    font-size: 18px;
+    font-weight: 500;
+    color: #FFFFFF;
+}
+
+/* Style for action buttons */
+.action-buttons {
+    position: static;
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #333;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: #9CA3AF;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: auto;
+}
+
+.action-btn:hover {
+    background: #E5E7EB;
+    color: #1C1C1C;
+    transform: none;
+    box-shadow: none;
+}
+
+.action-btn.copied {
+    background: #4CAF50;
+    color: #FFFFFF;
+}
+
+.action-btn.rewrite {
+    color: #9CA3AF;
+    background: transparent;
+}
+
+.action-btn.rewrite:hover {
+    background: #E5E7EB;
+    color: #1C1C1C;
 }
 
 /* Suggestions */
@@ -193,17 +317,31 @@ footer {
 strong {
     font-weight: bold;
 }
-.copy-btn {
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 10px;
-    display: none;  /* Hide button initially */
+
+/* Update the content container styles */
+.content-container {
+    margin-top: 24px;
+    padding: 0 12px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #E5E7EB;
 }
-.copy-btn:hover {
-    background-color: #45a049;
+
+.content-container p {
+    margin-bottom: 24px;
+    letter-spacing: 0.3px;
+}
+
+.content-container p:last-child {
+    margin-bottom: 0;
+}
+
+/* Add paragraph spacing within the content */
+.result-box p + p {
+    margin-top: 16px;
+}
+
+/* Remove the glow effect */
+.action-btn:hover {
+    box-shadow: none;
 }
