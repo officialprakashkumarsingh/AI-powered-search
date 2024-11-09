@@ -8,9 +8,13 @@
     <script src="https://www.gstatic.com/generativeai/v1/embedding.js"></script>
     <script type="module">
         import { db, storeSearchData } from './firebase-config.js';
-        // Make functions available globally
+        import { developerInfo } from './developer-info.js';
+        import { aiTrainingData } from './ai-training.js';
+        // Make everything available globally
         window.storeSearchData = storeSearchData;
         window.db = db;
+        window.developerInfo = developerInfo;
+        window.aiTrainingData = aiTrainingData;
     </script>
 </head>
 <body>
@@ -51,7 +55,8 @@
         const searchBtn = document.querySelector('.search-btn');
 
         async function searchQuery() {
-            const query = searchInput.value.trim();
+            const query = searchInput.value.trim().toLowerCase();
+            const queryWithoutSpaces = query.replace(/\s+/g, ''); // Remove all spaces
             if (!query) return;
 
             resultBox.style.display = 'block';
@@ -60,6 +65,55 @@
             const loader = document.createElement('div');
             loader.classList.add('loader');
             resultBox.appendChild(loader);
+
+            // Check for developer info queries with flexible matching
+            const isAskingAboutDeveloper = window.developerInfo.questions.some(keyword => {
+                const formattedKeyword = keyword.toLowerCase().replace(/\s+/g, '');
+                return queryWithoutSpaces === formattedKeyword || 
+                       queryWithoutSpaces === formattedKeyword + '?' || 
+                       queryWithoutSpaces === 'hey' + formattedKeyword || 
+                       queryWithoutSpaces === 'hi' + formattedKeyword;
+            });
+
+            if (isAskingAboutDeveloper) {
+                try {
+                    await window.storeSearchData(query, window.developerInfo.response);
+                    typeWriter(window.developerInfo.response);
+                    loader.remove();
+                    return;
+                } catch (firebaseError) {
+                    console.error('Firebase storage error:', firebaseError);
+                }
+            }
+
+            // Check for AI capability queries with flexible matching
+            const isAskingAboutCapabilities = window.aiTrainingData.capabilities.some(keyword => {
+                const formattedKeyword = keyword.toLowerCase().replace(/\s+/g, '');
+                return queryWithoutSpaces === formattedKeyword ||
+                       queryWithoutSpaces === formattedKeyword + '?' ||
+                       queryWithoutSpaces === 'hey' + formattedKeyword ||
+                       queryWithoutSpaces === 'hi' + formattedKeyword;
+            });
+
+            if (isAskingAboutCapabilities) {
+                // Find the matching keyword for the response
+                const matchingKeyword = window.aiTrainingData.capabilities.find(keyword => 
+                    keyword.toLowerCase().replace(/\s+/g, '') === queryWithoutSpaces
+                );
+                const response = matchingKeyword ? 
+                    window.aiTrainingData.customResponses[matchingKeyword.toLowerCase()] || 
+                    window.aiTrainingData.introduction : 
+                    window.aiTrainingData.introduction;
+
+                try {
+                    await window.storeSearchData(query, response);
+                    typeWriter(response);
+                    loader.remove();
+                    return;
+                } catch (firebaseError) {
+                    console.error('Firebase storage error:', firebaseError);
+                }
+            }
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
