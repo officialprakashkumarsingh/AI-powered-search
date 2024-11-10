@@ -50,46 +50,66 @@ main {
 .search-container {
     max-width: 800px;
     margin: 0 auto;
+    padding: 0 15px;
+    width: 100%;
 }
 
 .search-box {
     background: #2A2A2A;
     border-radius: 16px;
-    padding: 16px 20px;
+    padding: 12px 20px;
     display: flex;
     align-items: center;
+    gap: 10px;
     margin-bottom: 1rem;
     transition: all 0.3s ease;
     border: 1px solid #333;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
-.search-box:focus-within {
-    border-color: #ffffff;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
-}
-
-.search-box input {
+.search-box textarea {
     flex: 1;
     background: none;
     border: none;
     color: white;
     font-size: 1.1rem;
     outline: none;
-    padding-right: 1rem;
+    padding: 4px 0;
+    font-weight: 400;
+    resize: none;
+    min-height: 24px;
+    max-height: 150px;
+    font-family: inherit;
+    line-height: 1.5;
+    overflow-y: auto;
+    width: calc(100% - 50px);
+}
+
+.search-box textarea::placeholder {
+    color: #666;
     font-weight: 400;
 }
 
-.search-box input::placeholder {
-    color: #666;
-    font-weight: 400;
+/* Custom scrollbar for textarea */
+.search-box textarea::-webkit-scrollbar {
+    width: 4px;
+}
+
+.search-box textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.search-box textarea::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
 }
 
 .search-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .search-btn {
@@ -377,15 +397,76 @@ footer a:hover {
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
+        padding: 0 10px;
     }
     
-    .suggestions {
-        grid-template-columns: 1fr;
+    .subtitle {
+        font-size: 1rem;
+        padding: 0 15px;
     }
     
     main {
-        padding: 1rem;
+        padding: 1rem 0;
+    }
+    
+    .search-container {
+        padding: 0 10px;
+    }
+    
+    .search-box {
+        padding: 8px 12px;
+    }
+    
+    .search-box textarea {
+        font-size: 16px;
+    }
+    
+    .search-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    /* Adjust suggestion buttons for mobile */
+    .suggestion-row {
+        flex-direction: row;
+        gap: 8px;
+        padding: 0 5px;
+    }
+
+    .suggestion-btn {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+
+    /* Adjust result box for mobile */
+    .result-box {
+        padding: 15px;
+        margin: 10px 0;
+    }
+
+    /* Footer adjustments */
+    footer {
+        padding: 1rem 10px;
+    }
+
+    #rahul {
+        padding: 10px;
+    }
+}
+
+/* Additional adjustments for very small screens */
+@media (max-width: 380px) {
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .search-box {
+        padding: 8px 10px;
+    }
+
+    .search-btn {
+        padding: 6px 10px;
     }
 }
 strong {

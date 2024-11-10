@@ -26,10 +26,12 @@
 
         <div class="search-container">
             <div class="search-box">
-                <input type="text" placeholder="Search anything..." id="searchInput">
+                <textarea 
+                    id="searchInput" 
+                    placeholder="Search anything..." 
+                    rows="1"
+                ></textarea>
                 <div class="search-actions">
-                    <!-- <button class="attach-btn">📎</button> -->
-                    <!-- <div class="divider"></div> -->
                     <button class="search-btn">→</button>
                 </div>
             </div>
@@ -476,6 +478,23 @@
         searchBtn.addEventListener('click', searchQuery);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') searchQuery();
+        });
+
+        const textarea = document.getElementById('searchInput');
+        
+        textarea.addEventListener('input', function() {
+            // Reset height
+            this.style.height = 'auto';
+            // Set new height
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Prevent default Enter behavior and trigger search instead
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                searchQuery();
+            }
         });
     </script>
 </body>
