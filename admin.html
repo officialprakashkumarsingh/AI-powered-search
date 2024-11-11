@@ -606,7 +606,7 @@
                         <button class="export-btn" onclick="exportToExcel()">
                         <br>
                             <i class="fas fa-file-excel"></i>
-                            Export
+                            Data
                         </button>
                         <div class="user-info">
                             <i class="fas fa-user-circle"></i>
@@ -671,7 +671,8 @@
             orderBy, 
             getDocs,
             limit,
-            getCountFromServer
+            getCountFromServer,
+            where
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // Firebase configuration
@@ -704,16 +705,28 @@
                 const snapshot = await getCountFromServer(searchesRef);
                 const totalSearches = snapshot.data().count;
 
+                // Get today's searches count
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+
+                const todayQuery = query(
+                    searchesRef,
+                    orderBy('timestamp'),
+                    where('timestamp', '>=', today),
+                    where('timestamp', '<', tomorrow)
+                );
+                const todaySnapshot = await getCountFromServer(todayQuery);
+                const todaySearches = todaySnapshot.data().count;
+
                 // Get recent searches (limited to 10)
-                const q = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
-                const querySnapshot = await getDocs(q);
+                const recentQuery = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
+                const querySnapshot = await getDocs(recentQuery);
                 
-                let todaySearches = 0;
                 let totalCharacters = 0;
                 const uniqueUsers = new Set();
                 const searches = [];
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
@@ -721,10 +734,6 @@
 
                     totalCharacters += data.response?.length || 0;
                     uniqueUsers.add(data.userAgent);
-
-                    if (data.timestamp?.toDate() >= today) {
-                        todaySearches++;
-                    }
 
                     searches.push({
                         id: doc.id,
