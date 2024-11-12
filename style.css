@@ -22,7 +22,7 @@ main {
     padding: 2rem 1rem;
     max-width: 800px;
     margin: 0 auto;
-    margin-bottom: 2rem;
+    margin-bottom: 100px;
 }
 
 /* Hero Section */
@@ -356,10 +356,14 @@ footer {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    padding: 1rem 1rem 0.5rem 1rem;
+    padding: 1rem;
     background: #1C1C1C;
     margin-top: auto;
-    position: relative;
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    z-index: 99;
 }
 
 footer p {
@@ -372,6 +376,7 @@ footer a {
     text-decoration: none;
     transition: color 0.2s;
     font-size: 14px;
+    padding: 5px 10px;
 }
 
 footer a:hover {
@@ -470,11 +475,25 @@ footer a:hover {
 
     /* Footer adjustments */
     footer {
-        padding: 1rem 10px;
+        padding: 0.5rem;
+        bottom: 35px;
+    }
+
+    footer a {
+        font-size: 13px;
+        padding: 4px 8px;
     }
 
     #rahul {
-        padding: 10px;
+        padding: 8px;
+    }
+
+    #rahul a {
+        font-size: 13px;
+    }
+
+    main {
+        margin-bottom: 90px;
     }
 }
 
@@ -586,10 +605,14 @@ footer {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    padding: 1rem 1rem 0.5rem 1rem;
+    padding: 1rem;
     background: #1C1C1C;
     margin-top: auto;
-    position: relative;
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    z-index: 99;
 }
 
 footer p {
@@ -602,6 +625,7 @@ footer a {
     text-decoration: none;
     transition: color 0.2s;
     font-size: 14px;
+    padding: 5px 10px;
 }
 
 footer a:hover {
@@ -628,8 +652,14 @@ footer a:hover {
 /* Add these styles for the developer credit */
 #rahul {
     text-align: center;
-    margin-top: 0px;
-
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1C1C1C;
+    padding: 10px;
+    margin: 0;
+    z-index: 100;
 }
 
 #rahul a {
@@ -637,6 +667,7 @@ footer a:hover {
     text-decoration: none;
     transition: color 0.2s;
     font-size: 14px;
+    padding: 5px 10px;
 }
 
 #rahul a:hover {
