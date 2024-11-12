@@ -48,10 +48,10 @@ main {
 
 /* Search Container */
 .search-container {
+    width: 90%;
     max-width: 800px;
     margin: 0 auto;
-    padding: 0 15px;
-    width: 100%;
+    padding: 20px;
 }
 
 .search-box {
@@ -264,45 +264,68 @@ button:hover {
 
 /* Suggestions */
 .suggestions {
-    margin-top: 20px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .suggestion-row {
     display: flex;
-    justify-content: center;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 10px;
     width: 100%;
 }
 
 .suggestion-btn {
     flex: 1;
-    max-width: 300px;
-    padding: 10px 15px;
-    border: 1px solid #333;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     background: #2A2A2A;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 12px 16px;
     color: #E5E7EB;
-    cursor: pointer;
+    font-size: 14px;
     transition: all 0.2s ease;
-    text-align: left;
+    cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .suggestion-btn:hover {
     background: #333;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     border-color: #444;
+    transform: translateY(-1px);
 }
 
 .suggestion-btn span {
-    margin-right: 8px;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.suggestion-btn.blink {
+    animation: blink 1s infinite;
+    background: #2A2A2A;
+    border: 1px solid #333;
+    color: #666;
+    cursor: default;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 600px) {
+    .suggestion-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .suggestion-btn span {
+        font-size: 14px;
+    }
 }
 
 /* Loader */
@@ -733,4 +756,69 @@ footer a:hover {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
+}
+
+/* Mobile-specific styles */
+@media screen and (max-width: 600px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .search-container {
+        width: 95%;
+        padding: 10px;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .suggestion-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .result-box {
+        padding: 15px;
+    }
+    
+    .action-buttons {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .action-btn {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+/* Ensure suggestions stay 2x2 on all screen sizes */
+.suggestions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.suggestion-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.suggestion-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+}
+
+.suggestion-btn span {
+    flex-shrink: 0;
 }
