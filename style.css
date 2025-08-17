@@ -11,6 +11,8 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: #000000; /* Pure AMOLED black */
+    background-image: radial-gradient(circle, #333333 1px, transparent 1px);
+    background-size: 20px 20px;
     color: #FFFFFF;
     min-height: 100vh;
     line-height: 1.6;
