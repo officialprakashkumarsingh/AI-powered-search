@@ -1,8 +1,9 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "ahamai-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "AhamAI - AI-powered search application",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Know it all - AI Search</title>
+    <title>AhamAI - AI Search</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/generativeai/v1/embedding.js"></script>
     <script type="module">
@@ -18,13 +18,23 @@
     </script>
 </head>
 <body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <h1 class="splash-logo">AhamAI</h1>
+    </div>
+    
     <main>
         <div class="hero">
-            <h1>Know it all</h1>
+            <h1>AhamAI</h1>
             <p class="subtitle">Discover answers to everything with AI-powered search</p>
         </div>
 
         <div class="search-container">
+            <div class="model-selector">
+                <select id="modelSelect">
+                    <option value="gpt-3.5-turbo">Loading models...</option>
+                </select>
+            </div>
             <div class="search-box">
                 <textarea 
                     id="searchInput" 
@@ -58,20 +68,68 @@
             </div>
         </div>
     </main>
-    <footer>
-        <p><a href="about.html">About</a></p>
-        <p><a href="contact.html">Contact</a></p>
-        <p><a href="privacy.html">Privacy Policy</a></p>
-    </footer>
-    <p id="rahul"><a href="https://instagram.com/im.rahul.u">Developed by Rahul ✨</a></p>
+
 
     <script>
-        const API_KEY = "AIzaSyDdkTByUp6IvN70WfslYAPTn8lCEEa0hUI";
+        const API_KEY = "ahamaibyprakash25";
+        const API_BASE_URL = "https://ahamai-api.officialprakashkrsingh.workers.dev";
         const searchInput = document.getElementById('searchInput');
         const resultBox = document.getElementById('resultBox');
         const searchBtn = document.querySelector('.search-btn');
+        let selectedModel = 'gpt-3.5-turbo'; // default model
 
         const suggestionEmojis = ['🤖', '💡', '🔍', '💭', '❓', '🎯', '🌟', '📚'];
+
+        // Fetch available models from API
+        async function fetchModels() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/v1/models`, {
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`
+                    }
+                });
+                const data = await response.json();
+                
+                const modelSelect = document.getElementById('modelSelect');
+                modelSelect.innerHTML = '';
+                
+                if (data.data && Array.isArray(data.data)) {
+                    data.data.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.id;
+                        option.textContent = model.id;
+                        modelSelect.appendChild(option);
+                    });
+                    selectedModel = data.data[0]?.id || 'gpt-3.5-turbo';
+                } else {
+                    // Fallback models if API doesn't return proper format
+                    const fallbackModels = ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo'];
+                    fallbackModels.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model;
+                        option.textContent = model;
+                        modelSelect.appendChild(option);
+                    });
+                }
+                
+                modelSelect.addEventListener('change', (e) => {
+                    selectedModel = e.target.value;
+                });
+                
+            } catch (error) {
+                console.error('Error fetching models:', error);
+                // Set fallback models
+                const modelSelect = document.getElementById('modelSelect');
+                modelSelect.innerHTML = '';
+                const fallbackModels = ['gpt-3.5-turbo', 'gpt-4'];
+                fallbackModels.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelSelect.appendChild(option);
+                });
+            }
+        }
 
         async function searchQuery() {
             const query = searchInput.value.trim().toLowerCase();
@@ -225,23 +283,20 @@
             }
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`${API_BASE_URL}/v1/chat/completions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: query
-                            }]
+                        model: selectedModel,
+                        messages: [{
+                            role: 'user',
+                            content: query
                         }],
-                        generationConfig: {
-                            temperature: 0.9,
-                            topK: 1,
-                            topP: 1,
-                            maxOutputTokens: 2048,
-                        }
+                        temperature: 0.9,
+                        max_tokens: 2048
                     })
                 });
 
@@ -252,8 +307,8 @@
                 const data = await response.json();
                 console.log('API Response:', data); // Debug log
                 
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const answerText = data.candidates[0].content.parts[0].text;
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    const answerText = data.choices[0].message.content;
                     
                     // Store in Firebase if available
                     if (window.storeSearchData) {
@@ -290,15 +345,10 @@
             const header = document.createElement('div');
             header.className = 'result-header';
             
-            const icon = document.createElement('div');
-            icon.className = 'perplexity-icon';
-            icon.textContent = 'P';
-            
             const overview = document.createElement('div');
             overview.className = 'brief-overview';
             overview.textContent = "Here's a brief overview:";
             
-            header.appendChild(icon);
             header.appendChild(overview);
             
             // Add content container
@@ -409,29 +459,26 @@
             `;
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`${API_BASE_URL}/v1/chat/completions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
                     },
                     body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: "Generate 4 interesting, diverse, and trending search queries that people might want to know about. Each should be less than 6 words. Return only the queries separated by '|' without any other text."
-                            }]
+                        model: selectedModel,
+                        messages: [{
+                            role: 'user',
+                            content: "Generate 4 interesting, diverse, and trending search queries that people might want to know about. Each should be less than 6 words. Return only the queries separated by '|' without any other text."
                         }],
-                        generationConfig: {
-                            temperature: 0.9,
-                            topK: 1,
-                            topP: 1,
-                            maxOutputTokens: 256,
-                        }
+                        temperature: 0.9,
+                        max_tokens: 256
                     })
                 });
 
                 const data = await response.json();
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const suggestions = data.candidates[0].content.parts[0].text.split('|');
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    const suggestions = data.choices[0].message.content.split('|');
                     updateSuggestionButtons(suggestions);
                 }
             } catch (error) {
@@ -483,14 +530,88 @@
             }
         }
 
-        generateSuggestions();
-        setInterval(generateSuggestions, 300000);
+        // Initialize app
+        async function initializeApp() {
+            // Show splash screen
+            const splashScreen = document.getElementById('splash-screen');
+            const mainContent = document.querySelector('main');
+            
+            // Hide main content initially
+            mainContent.style.display = 'none';
+            
+            // Load models
+            await fetchModels();
+            
+            // Show splash for 2 seconds
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    mainContent.style.opacity = '0';
+                    setTimeout(() => {
+                        mainContent.style.opacity = '1';
+                    }, 100);
+                }, 500);
+            }, 2000);
+            
+            generateSuggestions();
+            setInterval(generateSuggestions, 300000);
+        }
 
         // Event Listeners
         searchBtn.addEventListener('click', searchQuery);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') searchQuery();
         });
+        
+        // Sketchware-compatible functions for APK conversion
+        function sketchwareInit() {
+            // Initialize app for Sketchware
+            initializeApp();
+        }
+        
+        function sketchwareSearch(query) {
+            // Set search input and trigger search
+            searchInput.value = query;
+            searchQuery();
+        }
+        
+        function sketchwareGetResult() {
+            // Get current result text
+            return resultBox.textContent || resultBox.innerHTML;
+        }
+        
+        function sketchwareSetModel(model) {
+            // Set AI model
+            selectedModel = model;
+            const modelSelect = document.getElementById('modelSelect');
+            modelSelect.value = model;
+        }
+        
+        function sketchwareGetModels() {
+            // Get available models
+            const modelSelect = document.getElementById('modelSelect');
+            const options = Array.from(modelSelect.options);
+            return options.map(option => option.value);
+        }
+        
+        // Make functions globally available for Sketchware
+        window.sketchwareInit = sketchwareInit;
+        window.sketchwareSearch = sketchwareSearch;
+        window.sketchwareGetResult = sketchwareGetResult;
+        window.sketchwareSetModel = sketchwareSetModel;
+        window.sketchwareGetModels = sketchwareGetModels;
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        
+        // Also initialize immediately if DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
 
         const textarea = document.getElementById('searchInput');
         
