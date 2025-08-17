@@ -409,6 +409,9 @@
             resultBox.appendChild(contentContainer);
             resultBox.appendChild(actionButtons);
             
+            // Make sure result box is visible
+            resultBox.style.display = 'block';
+            
             // Process text immediately
             const processedText = text
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
